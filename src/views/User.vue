@@ -8,8 +8,8 @@
 
     <div class="row">
       <div class="col-md-4">
-        <!-- <UserFollowingsCard /> -->
-        <!-- <UserFollowersCard /> -->
+        <UserFollowingsCard :followings="followings" />
+        <UserFollowersCard :followers="followers" />
       </div>
       <div class="col-md-8">
         <!-- <UserCommentsCard /> -->
@@ -21,6 +21,8 @@
 
 <script>
 import UserProfileCard from "./../components/UserProfileCard";
+import UserFollowingsCard from "./../components/UserFollowingsCard";
+import UserFollowersCard from "./../components/UserFollowersCard";
 
 const dummyUser = {
   currentUser: {
@@ -986,6 +988,8 @@ export default {
   name: "User",
   components: {
     UserProfileCard,
+    UserFollowingsCard,
+    UserFollowersCard,
   },
   data() {
     return {
@@ -1044,6 +1048,11 @@ export default {
         commentsLength: this.comments.length,
         favoritedRestaurantsLength: FavoritedRestaurants.length,
       };
+
+      this.isFollowed = isFollowed;
+      this.followings = Followings;
+      this.followers = Followers;
+      this.favoritedRestaurants = FavoritedRestaurants;
     },
   },
 };
