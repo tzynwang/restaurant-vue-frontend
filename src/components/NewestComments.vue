@@ -9,7 +9,7 @@
         <p>{{ comment.text }}</p>
         by
         <a href="#">{{ comment.User.name }}</a>
-        {{ comment.updatedAt | fromNow }}
+        at {{ comment.createdAt | fromNow }}
         <hr />
       </div>
     </div>
