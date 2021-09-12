@@ -8,51 +8,56 @@ Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
-    name: 'root',
-    redirect: { name: 'restaurants' }
+    path: "/",
+    name: "root",
+    redirect: { name: "restaurants" },
   },
   {
-    path: '/signin',
-    name: 'sign-in',
-    component: SignIn
+    path: "/signin",
+    name: "sign-in",
+    component: SignIn,
   },
   {
-    path: '/signup',
-    name: 'sign-up',
-    component: () => import('../views/SignUp.vue')
+    path: "/signup",
+    name: "sign-up",
+    component: () => import("../views/SignUp.vue"),
   },
   {
-    path: '/restaurants',
-    name: 'restaurants',
-    component: Restaurants
+    path: "/restaurants",
+    name: "restaurants",
+    component: Restaurants,
   },
   {
-    path: '/restaurants/feeds',
-    name: 'restaurants-feeds',
-    component: () => import('../views/RestaurantsFeeds.vue')
+    path: "/restaurants/feeds",
+    name: "restaurants-feeds",
+    component: () => import("../views/RestaurantsFeeds.vue"),
   },
   {
-    path: '/restaurants/top',
-    name: 'restaurants-tops',
-    component: () => import('../views/RestaurantsTop.vue')
+    path: "/restaurants/top",
+    name: "restaurants-tops",
+    component: () => import("../views/RestaurantsTop.vue"),
   },
   {
-    path: '/restaurants/:id',
-    name: 'restaurant',
-    component: () => import('../views/Restaurant.vue')
+    path: "/restaurants/:id",
+    name: "restaurant",
+    component: () => import("../views/Restaurant.vue"),
   },
   {
-    path: '/users/top',
-    name: 'users-top',
-    component: () => import('../views/UsersTop.vue')
+    path: "/restaurants/:id/dashboard",
+    name: "restaurant-dashboard",
+    component: () => import("../views/RestaurantDashboard.vue"),
   },
   {
-    path: '*',
-    name: 'not-found',
-    component: () => import('../views/NotFound.vue')
-  }
-]
+    path: "/users/top",
+    name: "users-top",
+    component: () => import("../views/UsersTop.vue"),
+  },
+  {
+    path: "*",
+    name: "not-found",
+    component: () => import("../views/NotFound.vue"),
+  },
+];
 
 const router = new VueRouter({
   routes,
