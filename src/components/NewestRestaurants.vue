@@ -18,23 +18,18 @@
   </div>
 </template>
 
-
 <script>
-import moment from 'moment'
+import { fromNowFilter } from "./../utils/mixins";
 
 export default {
   name: "NewestRestaurants",
+  mixins: [fromNowFilter],
   props: {
     restaurants: {
       type: Array,
       required: true,
     },
   },
-  filters: {
-    fromNow (dateTime) {
-      return dateTime ? moment(dateTime).fromNow() : '--'
-    }
-  }
 };
 </script>
 

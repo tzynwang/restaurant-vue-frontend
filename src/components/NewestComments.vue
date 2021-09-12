@@ -17,23 +17,18 @@
 </template>
 
 <script>
-import moment from 'moment'
+import { fromNowFilter } from "./../utils/mixins";
 
 export default {
   name: "NewestComments",
+  mixins: [fromNowFilter],
   props: {
     comments: {
       type: Array,
       required: true,
     },
   },
-  filters: {
-    fromNow (dateTime) {
-      return dateTime ? moment(dateTime).fromNow() : '--'
-    }
-  }
 };
 </script>
 
-<style>
-</style>
+<style></style>
