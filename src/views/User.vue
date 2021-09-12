@@ -12,8 +12,10 @@
         <UserFollowersCard :followers="followers" />
       </div>
       <div class="col-md-8">
-        <!-- <UserCommentsCard /> -->
-        <!-- <UserFavoritedRestaurantsCard /> -->
+        <UserCommentsCard :comments="comments" />
+        <UserFavoritedRestaurantsCard
+          :favorited-restaurants="favoritedRestaurants"
+        />
       </div>
     </div>
   </div>
@@ -23,6 +25,8 @@
 import UserProfileCard from "./../components/UserProfileCard";
 import UserFollowingsCard from "./../components/UserFollowingsCard";
 import UserFollowersCard from "./../components/UserFollowersCard";
+import UserCommentsCard from "./../components/UserCommentsCard";
+import UserFavoritedRestaurantsCard from "./../components/UserFavoritedRestaurantsCard";
 
 const dummyUser = {
   currentUser: {
@@ -990,6 +994,8 @@ export default {
     UserProfileCard,
     UserFollowingsCard,
     UserFollowersCard,
+    UserCommentsCard,
+    UserFavoritedRestaurantsCard,
   },
   data() {
     return {
