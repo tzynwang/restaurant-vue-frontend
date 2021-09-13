@@ -100,8 +100,13 @@ export default {
           throw new Error(data.message);
         }
 
-        // email password組合正確，保存token，移動至路由restaurants
+        // email password組合正確，保存token
         window.localStorage.setItem("token", data.token);
+
+        // 保存data.user至vuex
+        this.$store.commit("setCurrentUser", data.user);
+
+        // 移動至/restaurants
         this.$router.push({ name: "restaurants" });
       } catch (error) {
         this.password = "";
