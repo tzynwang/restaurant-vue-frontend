@@ -1,5 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
+import store from "./../store";
 
 import SignIn from "../views/SignIn.vue";
 import Restaurants from "../views/Restaurants.vue";
@@ -107,6 +108,12 @@ const routes = [
 const router = new VueRouter({
   routes,
   linkExactActiveClass: "active",
+});
+
+// 進入每條路由之前，都透過dispatch呼叫Vuex內的actions "fetchCurrentUser"
+router.beforeEach((to, from, next) => {
+  store.dispatch("fetchCurrentUser");
+  next();
 });
 
 export default router;
