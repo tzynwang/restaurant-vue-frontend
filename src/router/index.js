@@ -1,10 +1,10 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
+import Vue from "vue";
+import VueRouter from "vue-router";
 
-import SignIn from '../views/SignIn.vue'
-import Restaurants from '../views/Restaurants.vue'
+import SignIn from "../views/SignIn.vue";
+import Restaurants from "../views/Restaurants.vue";
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 const routes = [
   {
@@ -58,6 +58,16 @@ const routes = [
     component: () => import("../views/User.vue"),
   },
   {
+    path: "/admin",
+    exact: true,
+    redirect: "/admin/restaurants",
+  },
+  {
+    path: "/admin/restaurants",
+    name: "admin-restaurants",
+    component: () => import("../views/AdminRestaurants.vue"),
+  },
+  {
     path: "*",
     name: "not-found",
     component: () => import("../views/NotFound.vue"),
@@ -66,7 +76,7 @@ const routes = [
 
 const router = new VueRouter({
   routes,
-  linkExactActiveClass: 'active',
-})
+  linkExactActiveClass: "active",
+});
 
-export default router
+export default router;
