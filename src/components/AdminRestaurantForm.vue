@@ -181,7 +181,7 @@ export default {
         });
         return;
       }
-      
+
       if (!this.restaurant.categoryId) {
         Toast.fire({
           icon: "warning",
@@ -194,6 +194,17 @@ export default {
       const formData = new FormData(form);
       // 把資料傳給親元件
       this.$emit("after-submit", formData);
+    },
+  },
+  watch: {
+    // 為了Edit情境準備
+    // /admin/restaurants/:id/edit的狀態下換路由時會重fetch配合:id的餐廳資訊
+    // 監看initialRestaurant值是否有變化，若更新則覆蓋到this.restaurant上
+    initialRestaurant: function(newValue) {
+      this.restaurant = {
+        ...this.restaurant,
+        ...newValue,
+      };
     },
   },
 };
