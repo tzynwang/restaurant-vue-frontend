@@ -139,6 +139,23 @@ const dummyData = {
 
 export default {
   name: "AdminRestaurantForm",
+  props: {
+    initialRestaurant: {
+      type: Object,
+      // AdminRestaurantNew與AdminRestaurantEdit共用
+      // AdminRestaurantNew的時候帶空資料
+      // AdminRestaurantEdit的時候靠props接收親元件傳下來的資料
+      default: () => ({
+        name: "",
+        categoryId: "",
+        tel: "",
+        address: "",
+        description: "",
+        image: "",
+        openingHours: "",
+      }),
+    },
+  },
   data() {
     return {
       restaurant: {
@@ -155,6 +172,10 @@ export default {
   },
   created() {
     this.fetchCategories();
+    this.restaurant = {
+      ...this.restaurant,
+      ...this.initialRestaurant,
+    };
   },
   methods: {
     fetchCategories() {
@@ -175,7 +196,7 @@ export default {
       const form = event.target;
       const formData = new FormData(form);
       // 把資料傳給親元件
-      this.$emit('after-submit', formData)
+      this.$emit("after-submit", formData);
     },
   },
 };
