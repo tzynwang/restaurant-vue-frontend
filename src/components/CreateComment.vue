@@ -16,7 +16,8 @@
 </template>
 
 <script>
-import { v4 as uuidv4 } from "uuid";
+import commentsAPI from "./../apis/comments";
+import { Toast } from "./../utils/helpers";
 
 export default {
   name: "CreateComment",
@@ -32,13 +33,40 @@ export default {
     };
   },
   methods: {
-    handleSubmit() {
-      this.$emit("after-add-comment", {
-        commentId: uuidv4(), // 應在順利新增comment後由後端返回，尚未串接API時使用隨機id
-        restaurantId: this.restaurantId,
-        text: this.text,
-      });
-      this.text = ""; // 將表單內的資料清空
+    async handleSubmit() {
+      try {
+        if (!this.text) {
+          Toast.fire({
+            icon: "warning",
+            title: "您尚未填寫任何評論",
+          });
+          return;
+        }
+
+        const { data } = await commentsAPI.create({
+          restaurantId: this.restaurantId,
+          text: this.text,
+        });
+
+        if (data.status === "error") {
+          throw new Error(data.message);
+        }
+
+        // 後端新增確認OK後，修改前端現有資料，驅動畫面重渲染
+        this.$emit("after-add-comment", {
+          commentId: data.commentId,
+          restaurantId: this.restaurantId,
+          text: this.text,
+        });
+
+        // 將表單內的資料清空
+        this.text = "";
+      } catch (error) {
+        Toast.fire({
+          icon: "error",
+          title: "無法新增評論，請稍後再試",
+        });
+      }
     },
   },
 };
