@@ -14,9 +14,11 @@
     >
       <div class="row no-gutters">
         <div class="col-md-4">
-          <a href="#">
-            <img class="card-img" :src="restaurant.image" />
-          </a>
+          <router-link
+            :to="{ name: 'restaurant', params: { id: restaurant.id } }"
+          >
+            <img class="card-img" :src="restaurant.image | emptyImage" />
+          </router-link>
         </div>
         <div class="col-md-8">
           <div class="card-body">
@@ -61,6 +63,7 @@
 
 <script>
 import NavTabs from "./../components/NavTabs";
+import { emptyImageFilter } from "./../utils/mixins";
 
 const dummyData = {
   restaurants: [
@@ -237,6 +240,7 @@ export default {
   components: {
     NavTabs,
   },
+  mixins: [emptyImageFilter],
   data() {
     return {
       restaurants: [],

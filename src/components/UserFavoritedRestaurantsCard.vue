@@ -10,7 +10,7 @@
         :to="{ name: 'restaurant', params: { id: favoritedRestaurant.id } }"
       >
         <img
-          :src="favoritedRestaurant.image"
+          :src="favoritedRestaurant.image | emptyImage"
           width="60"
           height="60"
           class="mr-1 mb-1"
@@ -21,8 +21,11 @@
 </template>
 
 <script>
+import { emptyImageFilter } from "./../utils/mixins";
+
 export default {
   name: "UserFavoritedRestaurantsCard",
+  mixins: [emptyImageFilter],
   props: {
     favoritedRestaurants: {
       type: Array,
