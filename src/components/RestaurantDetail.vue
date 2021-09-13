@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import { emptyImageFilter } from './../utils/mixins'
+import { emptyImageFilter } from "./../utils/mixins";
 
 export default {
   name: "RestaurantDetail",
@@ -102,6 +102,14 @@ export default {
     },
     addLike(restaurantId) {
       this.restaurant.isLiked = !this.restaurant.isLiked;
+    },
+  },
+  watch: {
+    initialRestaurant(newValue) {
+      this.restaurant = {
+        ...this.restaurant,
+        ...newValue,
+      };
     },
   },
 };
