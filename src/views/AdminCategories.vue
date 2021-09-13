@@ -43,13 +43,41 @@
             {{ category.id }}
           </th>
           <td class="position-relative">
-            <div class="category-name">
+            <div v-show="!category.isEditing" class="category-name">
               {{ category.name }}
             </div>
+            <input
+              v-show="category.isEditing"
+              v-model="category.name"
+              type="text"
+              class="form-control"
+            />
+            <span
+              v-show="category.isEditing"
+              class="cancel"
+              @click="handleCancel(category.id)"
+            >
+              ✕
+            </span>
           </td>
           <td class="d-flex justify-content-between">
-            <button type="button" class="btn btn-link mr-2">
+            <button
+              v-show="!category.isEditing"
+              type="button"
+              class="btn btn-link mr-2"
+              @click.stop.prevent="toggleIsEditing(category.id)"
+            >
               Edit
+            </button>
+            <button
+              v-show="category.isEditing"
+              type="button"
+              class="btn btn-link mr-2"
+              @click.stop.prevent="
+                updateCategory({ categoryId: category.id, name: category.name })
+              "
+            >
+              Save
             </button>
             <button
               type="button"
@@ -114,7 +142,11 @@ export default {
   },
   methods: {
     fetchCategories() {
-      this.categories = dummyData.categories;
+      this.categories = dummyData.categories.map((category) => ({
+        ...category,
+        isEditing: false,
+        nameCached: "",
+      }));
     },
     createCategory() {
       this.categories.push({
@@ -122,6 +154,38 @@ export default {
         name: this.newCategoryName,
       });
       this.newCategoryName = "";
+    },
+    toggleIsEditing(categoryId) {
+      this.categories = this.categories.map((category) => {
+        if (category.id === categoryId) {
+          return {
+            ...category,
+            isEditing: !category.isEditing,
+            // 保存「開始編輯前的名稱」，使用者若按下X，即可還原成編輯前的名稱
+            nameCached: category.name,
+          };
+        } else {
+          return category;
+        }
+      });
+    },
+    updateCategory({ categoryId, name }) {
+      // TODO: 透過 API 去向伺服器更新餐廳類別名稱
+      this.toggleIsEditing(categoryId);
+    },
+    handleCancel(categoryId) {
+      this.categories = this.categories.map((category) => {
+        if (category.id === categoryId) {
+          return {
+            ...category,
+            // 把原本的餐廳類別名稱還原回去
+            name: category.nameCached,
+          };
+        }
+        return category;
+      });
+
+      this.toggleIsEditing(categoryId);
     },
     deleteCategory(categoryId) {
       this.categories = this.categories.filter(
@@ -131,3 +195,38 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.category-name {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid transparent;
+  outline: 0;
+  cursor: auto;
+}
+
+.btn-link {
+  width: 62px;
+}
+
+.cancel {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 25px;
+  height: 25px;
+
+  border: 1px solid #aaaaaa;
+  border-radius: 50%;
+
+  font-size: 12px;
+
+  user-select: none;
+  cursor: pointer;
+}
+</style>
