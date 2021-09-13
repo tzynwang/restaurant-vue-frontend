@@ -34,8 +34,12 @@
         />
       </div>
 
-      <button class="btn btn-lg btn-primary btn-block mb-3" type="submit">
-        Submit
+      <button
+        class="btn btn-lg btn-primary btn-block mb-3"
+        type="submit"
+        :disabled="isProcessing"
+      >
+        {{ isProcessing ? "Processing..." : "Submit" }}
       </button>
 
       <div class="text-center mb-3">
@@ -50,25 +54,56 @@
 </template>
 
 <script>
+  import authorizationAPI from "./../apis/authorization";
+  import { Toast } from "./../utils/helpers";
+
 export default {
   name: "SignIn",
   data() {
     return {
       email: "",
       password: "",
+      isProcessing: false,
     };
   },
   methods: {
-    handleSubmit() {
-      const data = JSON.stringify({
-        email: this.email,
-        password: this.password,
-      });
-      console.log(data);
+    async handleSubmit(event) {
+      try {
+        // email與password沒有填寫直接return
+        if (!this.email || !this.password) {
+          Toast.fire({
+            icon: "warning",
+            title: "請輸入 email 和 password",
+          });
+          return;
+        }
+
+        // 與後端確認email password組合的正確性
+        this.isProcessing = true;
+
+        const { data } = await authorizationAPI.signIn({
+          email: this.email,
+          password: this.password,
+        });
+
+        if (data.status !== "success") {
+          throw new Error(data.message);
+        }
+
+        // email password組合正確，保存token，移動至路由restaurants
+        window.localStorage.setItem("token", data.token);
+        this.$router.push({ name: "restaurants" });
+      } catch (error) {
+        this.password = "";
+        Toast.fire({
+          icon: "warning",
+          title: "請確認您輸入了正確的帳號密碼",
+        });
+        this.isProcessing = false;
+      }
     },
   },
 };
 </script>
 
-<style>
-</style>
+<style></style>
