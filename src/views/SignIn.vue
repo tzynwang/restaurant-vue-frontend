@@ -54,8 +54,8 @@
 </template>
 
 <script>
-  import authorizationAPI from "./../apis/authorization";
-  import { Toast } from "./../utils/helpers";
+import authorizationAPI from "./../apis/authorization";
+import { Toast } from "./../utils/helpers";
 
 export default {
   name: "SignIn",
@@ -65,6 +65,16 @@ export default {
       password: "",
       isProcessing: false,
     };
+  },
+  beforeRouteEnter(to, from, next) {
+    const { register } = to.params;
+    if (register === "success") {
+      Toast.fire({
+        icon: "success",
+        title: "註冊成功，請輸入Email與密碼進行登入",
+      });
+    }
+    next();
   },
   methods: {
     async handleSubmit(event) {

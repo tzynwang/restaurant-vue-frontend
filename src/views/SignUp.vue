@@ -19,7 +19,7 @@
           autocomplete="username"
           required
           autofocus
-        >
+        />
       </div>
 
       <div class="form-label-group mb-2">
@@ -33,7 +33,7 @@
           placeholder="email"
           autocomplete="email"
           required
-        >
+        />
       </div>
 
       <div class="form-label-group mb-3">
@@ -47,7 +47,7 @@
           placeholder="Password"
           autocomplete="new-password"
           required
-        >
+        />
       </div>
 
       <div class="form-label-group mb-3">
@@ -61,13 +61,10 @@
           placeholder="Password"
           autocomplete="new-password"
           required
-        >
+        />
       </div>
 
-      <button
-        class="btn btn-lg btn-primary btn-block mb-3"
-        type="submit"
-      >
+      <button class="btn btn-lg btn-primary btn-block mb-3" type="submit">
         Submit
       </button>
 
@@ -87,6 +84,9 @@
 </template>
 
 <script>
+import authorizationAPI from "./../apis/authorization";
+import { Toast } from "./../utils/helpers";
+
 export default {
   name: "SignUp",
   data() {
@@ -94,22 +94,60 @@ export default {
       name: "",
       email: "",
       password: "",
-      passwordCheck: ""
+      passwordCheck: "",
     };
   },
   methods: {
-    handleSubmit() {
-      const data = JSON.stringify({
-        name: this.name,
-        email: this.email,
-        password: this.password,
-        passwordCheck: this.passwordCheck
-      });
-      console.log(data);
+    async handleSubmit() {
+      try {
+        if (
+          !this.name ||
+          !this.email ||
+          !this.password ||
+          !this.passwordCheck
+        ) {
+          Toast.fire({
+            icon: "warning",
+            title: "請確認已填寫所有欄位",
+          });
+          return;
+        }
+
+        if (this.password !== this.passwordCheck) {
+          Toast.fire({
+            icon: "warning",
+            title: "兩次輸入的密碼不同",
+          });
+          this.passwordCheck = "";
+          return;
+        }
+
+        const { data } = await authorizationAPI.signUp({
+          name: this.name,
+          email: this.email,
+          password: this.password,
+          passwordCheck: this.passwordCheck,
+        });
+
+        if (data.status === "error") {
+          throw new Error(data.message);
+        }
+
+        // 註冊成功，導向sign-in，並顯示toast
+        Toast.fire({
+          icon: "success",
+          title: data.message,
+        });
+        this.$router.push({ name: "sign-in", params: { register: "success" } });
+      } catch (error) {
+        Toast.fire({
+          icon: "warning",
+          title: `無法註冊 - ${error.message}`,
+        });
+      }
     },
   },
 };
 </script>
 
-<style>
-</style>
+<style></style>
