@@ -1,9 +1,9 @@
 <template>
   <div class="container py-5">
     <AdminNav />
-    <a href="#" class="btn btn-primary mb-4">
+    <router-link :to="{ name: 'admin-restaurant-new' }" class="btn btn-primary mb-4">
       New Restaurant
-    </a>
+    </router-link>
 
     <AdminRestaurantsTable />
   </div>
