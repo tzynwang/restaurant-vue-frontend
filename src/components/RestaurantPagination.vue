@@ -3,6 +3,7 @@
     <ul class="pagination">
       <!-- 前一頁 previousPage -->
       <li
+        @click="scrollToTop"
         v-show="previousPage"
         :class="['page-item', { disabled: currentPage === 1 }]"
       >
@@ -20,6 +21,7 @@
 
       <!-- 頁碼 -->
       <li
+        @click="scrollToTop"
         v-for="page in totalPage"
         :key="page"
         :class="['page-item', { active: currentPage === page }]"
@@ -34,6 +36,7 @@
 
       <!-- 後一頁 nextPage -->
       <li
+        @click="scrollToTop"
         v-show="nextPage"
         :class="['page-item', { disabled: currentPage === totalPage.length }]"
       >
@@ -72,6 +75,15 @@ export default {
     nextPage: {
       type: Number,
       required: true,
+    },
+  },
+  methods: {
+    scrollToTop() {
+      window.scroll({
+        top: 0,
+        left: 0,
+        behavior: "smooth",
+      });
     },
   },
 };
