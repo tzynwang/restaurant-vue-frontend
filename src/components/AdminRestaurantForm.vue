@@ -1,7 +1,7 @@
 <template>
-  <form @submit.stop.prevent="handleSubmit">
+  <form v-show="!isLoading" @submit.stop.prevent="handleSubmit">
     <div class="form-group">
-      <label for="name">Name</label>
+      <label for="name">*Name</label>
       <input
         id="name"
         v-model="restaurant.name"
@@ -14,7 +14,7 @@
     </div>
 
     <div class="form-group">
-      <label for="categoryId">Category</label>
+      <label for="categoryId">*Category</label>
       <select
         id="categoryId"
         v-model="restaurant.categoryId"
@@ -101,41 +101,15 @@
       />
     </div>
 
-    <button type="submit" class="btn btn-primary">
-      送出
+    <button type="submit" class="btn btn-primary" :disabled="isProcessing">
+      {{ isProcessing ? "處理中..." : "送出" }}
     </button>
   </form>
 </template>
 
 <script>
-const dummyData = {
-  categories: [
-    {
-      id: 1,
-      name: "中式料理",
-      createdAt: "2019-06-22T09:00:43.000Z",
-      updatedAt: "2019-06-22T09:00:43.000Z",
-    },
-    {
-      id: 2,
-      name: "日本料理",
-      createdAt: "2019-06-22T09:00:43.000Z",
-      updatedAt: "2019-06-22T09:00:43.000Z",
-    },
-    {
-      id: 3,
-      name: "義大利料理",
-      createdAt: "2019-06-22T09:00:43.000Z",
-      updatedAt: "2019-06-22T09:00:43.000Z",
-    },
-    {
-      id: 4,
-      name: "墨西哥料理",
-      createdAt: "2019-06-22T09:00:43.000Z",
-      updatedAt: "2019-06-22T09:00:43.000Z",
-    },
-  ],
-};
+import adminAPI from "./../apis/admin";
+import { Toast } from "./../utils/helpers";
 
 export default {
   name: "AdminRestaurantForm",
@@ -143,8 +117,8 @@ export default {
     initialRestaurant: {
       type: Object,
       // AdminRestaurantNew與AdminRestaurantEdit共用
-      // AdminRestaurantNew的時候帶空資料
-      // AdminRestaurantEdit的時候靠props接收親元件傳下來的資料
+      // New的時候帶空資料
+      // Edit的時候靠props接收親元件傳下來的資料
       default: () => ({
         name: "",
         categoryId: "",
@@ -155,31 +129,38 @@ export default {
         openingHours: "",
       }),
     },
+    isProcessing: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
-      restaurant: {
-        name: "",
-        categoryId: "",
-        tel: "",
-        address: "",
-        description: "",
-        image: "",
-        openingHours: "",
-      },
       categories: [],
+      restaurant: {
+        ...this.initialRestaurant,
+      },
+      isLoading: true,
     };
   },
   created() {
     this.fetchCategories();
-    this.restaurant = {
-      ...this.restaurant,
-      ...this.initialRestaurant,
-    };
   },
   methods: {
-    fetchCategories() {
-      this.categories = dummyData.categories;
+    async fetchCategories() {
+      try {
+        const { data } = await adminAPI.categories.get();
+
+        this.categories = data.categories;
+        // isLoading預設為true，僅有在成功fetch到全部餐廳類別後才會轉為false
+        // 進而顯示整個表單
+        this.isLoading = false;
+      } catch (error) {
+        Toast.fire({
+          icon: "error",
+          title: "無法取得餐廳類別，請稍後再試",
+        });
+      }
     },
     handleFileChange(event) {
       const { files } = event.target;
@@ -193,6 +174,22 @@ export default {
       }
     },
     handleSubmit(event) {
+      if (!this.restaurant.name) {
+        Toast.fire({
+          icon: "warning",
+          title: "請填寫餐廳名稱",
+        });
+        return;
+      }
+      
+      if (!this.restaurant.categoryId) {
+        Toast.fire({
+          icon: "warning",
+          title: "請選擇餐廳類別",
+        });
+        return;
+      }
+
       const form = event.target;
       const formData = new FormData(form);
       // 把資料傳給親元件
