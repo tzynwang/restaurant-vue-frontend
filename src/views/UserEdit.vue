@@ -34,47 +34,100 @@
         />
       </div>
 
-      <button type="submit" class="btn btn-primary">
-        Submit
+      <button type="submit" class="btn btn-primary" :disabled="isProcessing">
+        {{ isProcessing ? "Processing..." : "Submit" }}
       </button>
     </form>
   </div>
 </template>
 
 <script>
+import { mapState } from "vuex";
+import usersAPI from "./../apis/users";
+import { Toast } from "./../utils/helpers";
+
 export default {
   name: "UserEdit",
   data() {
     return {
       id: -1,
-      name: "",
       image: "",
+      name: "",
+      email: "",
+      isProcessing: false
     };
   },
   created() {
     // 透過 this.$route.params 取得網址上的 id，才知道現在在編輯哪一個使用者
-    const { id } = this.$route.params;
-    this.id = id;
+    if (this.currentUser.id === -1) return
+    const { id } = this.$route.params
+    this.setUser(id)
+  },
+  beforeRouteUpdate(to, from, next) {
+    if (this.currentUser.id === -1) return;
+    const { id } = to.params;
+    this.setUser(id);
+    next();
   },
   methods: {
+    setUser(userId) {
+      const { id, image, name, email } = this.currentUser;
+
+      // 只能編輯自己
+      if (id.toString() !== userId.toString()) {
+        this.$router.push({ name: "not-found" });
+        return;
+      }
+
+      this.id = id;
+      this.name = name;
+      this.email = email;
+      this.image = image;
+    },
     handleFileChange(event) {
       const { files } = event.target;
-      if (files.length) {
-        // 有上傳檔案，產生預覽圖
-        const imageURL = window.URL.createObjectURL(files[0]);
-        this.image = imageURL;
-      } else {
-        // 使用者沒有選擇上傳的檔案
-        this.image = "";
+      // 沒有上傳圖片
+      if (!files.length) return;
+      // 有上傳圖片則製作預覽圖
+      const imageURL = window.URL.createObjectURL(files[0]);
+      this.image = imageURL;
+    },
+    async handleSubmit(event) {
+      try {
+        if (!this.name) {
+          Toast.fire({
+            icon: "warning",
+            title: "您尚未填寫姓名",
+          });
+          return;
+        }
+
+        const form = event.target;
+        const formData = new FormData(form);
+
+        this.isProcessing = true;
+
+        const { data } = await usersAPI.update({
+          userId: this.id,
+          formData,
+        });
+
+        if (data.status === "error") {
+          throw new Error(data.message);
+        }
+
+        this.$router.push({ name: "user", params: { id: this.id } });
+      } catch (error) {
+        Toast.fire({
+          icon: "error",
+          title: "無法更新使用者資料，請稍後再試",
+        });
+        this.isProcessing = false;
       }
     },
-    handleSubmit(event) {
-      const form = event.target;
-      const formData = new FormData(form);
-      formData.forEach((value, key) => {
-        console.log(value, key)
-      })
-    },
+  },
+  computed: {
+    ...mapState(["currentUser"]),
   },
 };
 </script>
