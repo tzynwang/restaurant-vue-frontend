@@ -2,7 +2,12 @@
   <div class="card mb-3">
     <div class="row no-gutters">
       <div class="col-md-4">
-        <img :src="user.image | emptyImage" width="300px" height="300px" />
+        <img
+          :src="user.image | emptyImage"
+          width="100%"
+          height="100%"
+          style="object-fit: cover;"
+        />
       </div>
       <div class="col-md-8">
         <div class="card-body">
