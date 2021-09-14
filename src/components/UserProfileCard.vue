@@ -65,6 +65,8 @@
 
 <script>
 import { emptyImageFilter } from "./../utils/mixins";
+import usersAPI from "./../apis/users";
+import { Toast } from "./../utils/helpers";
 
 export default {
   name: "UserProfileCard",
@@ -89,11 +91,43 @@ export default {
     };
   },
   methods: {
-    addFollowing(userId) {
-      this.isFollowed = !this.isFollowed;
+    async addFollowing(userId) {
+      try {
+        const { data } = await usersAPI.addFollowing({ userId });
+
+        if (data.status === "error") {
+          throw new Error(data.message);
+        }
+
+        // 確認後端資料更新成功後，修改前端現有資料驅動畫面重渲染
+        this.isFollowed = true;
+      } catch (error) {
+        Toast.fire({
+          icon: "error",
+          title: "無法加入追蹤，請稍後再試",
+        });
+      }
     },
-    deleteFollowing(userId) {
-      this.isFollowed = !this.isFollowed;
+    async deleteFollowing(userId) {
+      try {
+        const { data } = await usersAPI.deleteFollowing({ userId });
+
+        if (data.status === "error") {
+          throw new Error(data.message);
+        }
+
+        this.isFollowed = false;
+      } catch (error) {
+        Toast.fire({
+          icon: "error",
+          title: "無法取消追蹤，請稍後再試",
+        });
+      }
+    },
+  },
+  watch: {
+    initialIsFollowed(isFollowed) {
+      this.isFollowed = isFollowed;
     },
   },
 };
