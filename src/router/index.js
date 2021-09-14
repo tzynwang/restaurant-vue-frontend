@@ -99,8 +99,12 @@ const routes = [
     component: () => import("../views/AdminUsers.vue"),
   },
   {
-    path: "*",
+    // 參考 https://github.com/vuejs/vue-router/issues/724#issuecomment-301260298
+    // 參考 https://router.vuejs.org/guide/essentials/redirect-and-alias.html#alias
+    // 使用alias將無法匹配的路由導向/404
     name: "not-found",
+    path: "/404",
+    alias: "*",
     component: () => import("../views/NotFound.vue"),
   },
 ];
