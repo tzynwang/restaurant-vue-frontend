@@ -130,9 +130,34 @@ const router = new VueRouter({
   linkExactActiveClass: "active",
 });
 
-// 進入每條路由之前，都透過dispatch呼叫Vuex內的actions "fetchCurrentUser"
-router.beforeEach((to, from, next) => {
-  store.dispatch("fetchCurrentUser");
+router.beforeEach(async (to, from, next) => {
+  const tokenInLocalStorage = window.localStorage.getItem("token");
+  const tokenInStore = store.state.token;
+  let isAuthenticated = store.state.isAuthenticated;
+
+  // 比較 localStorage 和 store 中的 token 是否一樣
+  // 先 !== 再 &&
+  // 翻譯：先比較localStorage與vuex的token是否「不同」
+  // 兩邊不同，且localStorage「有token」的話，進行 fetchCurrentUser
+  if (tokenInLocalStorage && tokenInLocalStorage !== tokenInStore) {
+    isAuthenticated = await store.dispatch("fetchCurrentUser");
+  }
+
+  // 對於不需要驗證 token 的頁面
+  const pathsWithoutAuthentication = ["sign-up", "sign-in"];
+
+  // 如果 token 無效且又想進入需要驗證的頁面，轉到/signin
+  if (!isAuthenticated && !pathsWithoutAuthentication.includes(to.name)) {
+    next("/signin");
+    return;
+  }
+
+  // 如果 token 有效且又想進入登入註冊頁面，轉到/restaurants
+  if (isAuthenticated && pathsWithoutAuthentication.includes(to.name)) {
+    next("/restaurants");
+    return;
+  }
+
   next();
 });
 
