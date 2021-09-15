@@ -15,6 +15,7 @@ export default new Vuex.Store({
       isAdmin: false,
     },
     isAuthenticated: false,
+    token: "",
   },
   mutations: {
     setCurrentUser(state, currentUser) {
@@ -24,7 +25,20 @@ export default new Vuex.Store({
         // 再將fetch得來的currentUser資料覆蓋上去
         ...currentUser,
       };
+      state.token = window.localStorage.getItem("token");
       state.isAuthenticated = true;
+    },
+    revokeAuthentication(state) {
+      state.currentUser = {
+        id: -1,
+        name: "",
+        email: "",
+        image: "",
+        isAdmin: false,
+      };
+      state.isAuthenticated = false;
+      state.token = "";
+      window.localStorage.removeItem("token");
     },
   },
   actions: {
@@ -43,6 +57,9 @@ export default new Vuex.Store({
         });
       } catch (error) {
         console.error(error);
+        // 驗證失敗則觸發登出行為，以清除 state 中的 token
+        commit("revokeAuthentication");
+        return false;
       }
     },
   },
