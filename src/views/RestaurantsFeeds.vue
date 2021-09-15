@@ -1,20 +1,23 @@
 <template>
   <div class="container py-5">
     <NavTabs />
-    <h1 class="mt-5">最新動態</h1>
-    <hr />
-    <div class="row">
-      <div class="col-md-6">
-        <h2 class="h3">最新餐廳</h2>
-        <!-- 最新餐廳 NewestRestaurants -->
-        <NewestRestaurants :restaurants="restaurants" />
+    <Spinner v-if="isLoading" />
+    <template v-else>
+      <h1 class="mt-5">最新動態</h1>
+      <hr />
+      <div class="row">
+        <div class="col-md-6">
+          <h2 class="h3">最新餐廳</h2>
+          <!-- 最新餐廳 NewestRestaurants -->
+          <NewestRestaurants :restaurants="restaurants" />
+        </div>
+        <div class="col-md-6">
+          <!-- 最新評論 NewestComments-->
+          <h2 class="h3">最新評論</h2>
+          <NewestComments :comments="comments" />
+        </div>
       </div>
-      <div class="col-md-6">
-        <!-- 最新評論 NewestComments-->
-        <h2 class="h3">最新評論</h2>
-        <NewestComments :comments="comments" />
-      </div>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -25,6 +28,7 @@ import { Toast } from "./../utils/helpers";
 import NavTabs from "./../components/NavTabs";
 import NewestRestaurants from "./../components/NewestRestaurants";
 import NewestComments from "./../components/NewestComments";
+import Spinner from "./../components/Spinner";
 
 export default {
   name: "RestaurantsFeeds",
@@ -32,11 +36,13 @@ export default {
     NavTabs,
     NewestRestaurants,
     NewestComments,
+    Spinner,
   },
   data() {
     return {
       restaurants: [],
       comments: [],
+      isLoading: true,
     };
   },
   created() {
@@ -45,19 +51,24 @@ export default {
   methods: {
     async fetchFeeds() {
       try {
+        this.isLoading = true;
+
         const { data } = await restaurantsAPI.getFeeds();
         const { restaurants, comments } = data;
         this.restaurants = restaurants;
-        
+
         // 過濾有內容的comment
         this.comments = comments.filter(
           (comment) => comment.Restaurant && comment.text
         );
+
+        this.isLoading = false;
       } catch (error) {
         Toast.fire({
           icon: "error",
           title: "無法取得最新動態，請稍後再試",
         });
+        this.isLoading = false;
       }
     },
   },

@@ -1,46 +1,53 @@
 <template>
   <div class="container py-5">
     <NavTabs />
-    <h1 class="mt-5">
-      美食達人
-    </h1>
-    <hr />
-    <div class="row text-center">
-      <!-- user card -->
-      <div v-for="user in users" :key="user.id" class="col-3">
-        <router-link :to="{ name: 'user', params: { id: user.id } }">
-          <img :src="user.image | emptyImage" />
-        </router-link>
-        <h2>{{ user.name }}</h2>
-        <span class="badge badge-secondary"
-          >追蹤人數：{{ user.followerCount }}</span
-        >
-        <p class="mt-3">
-          <button
-            v-if="user.isFollowed"
-            @click.stop.prevent="deleteFollowing(user.id)"
-            type="button"
-            class="btn btn-danger"
+
+    <Spinner v-if="isLoading" />
+    <template v-else>
+      <h1 class="mt-5">
+        美食達人
+      </h1>
+      <hr />
+      <div class="row text-center">
+        <!-- user card -->
+        <div v-for="user in users" :key="user.id" class="col-3">
+          <router-link :to="{ name: 'user', params: { id: user.id } }">
+            <img :src="user.image | emptyImage" />
+          </router-link>
+          <h2>{{ user.name }}</h2>
+          <span class="badge badge-secondary"
+            >追蹤人數：{{ user.followerCount }}</span
           >
-            取消追蹤
-          </button>
-          <button
-            v-else
-            @click.stop.prevent="addFollowing(user.id)"
-            type="button"
-            class="btn btn-primary"
-          >
-            追蹤
-          </button>
-        </p>
+          <p class="mt-3">
+            <button
+              v-if="user.isFollowed"
+              @click.stop.prevent="deleteFollowing(user.id)"
+              type="button"
+              class="btn btn-danger"
+            >
+              取消追蹤
+            </button>
+            <button
+              v-else
+              @click.stop.prevent="addFollowing(user.id)"
+              type="button"
+              class="btn btn-primary"
+            >
+              追蹤
+            </button>
+          </p>
+        </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 
 <script>
 import NavTabs from "./../components/NavTabs";
+import Spinner from "./../components/Spinner";
+
 import { emptyImageFilter } from "./../utils/mixins";
+
 import usersAPI from "./../apis/users";
 import { Toast } from "./../utils/helpers";
 
@@ -48,11 +55,13 @@ export default {
   name: "UsersTop",
   components: {
     NavTabs,
+    Spinner,
   },
   mixins: [emptyImageFilter],
   data() {
     return {
       users: [],
+      isLoading: true,
     };
   },
   created() {
@@ -61,6 +70,7 @@ export default {
   methods: {
     async fetchTopUsers() {
       try {
+        this.isLoading = true;
         const { data } = await usersAPI.getTopUsers();
 
         if (data.status === "error") {
@@ -74,11 +84,13 @@ export default {
           followerCount: user.FollowerCount,
           isFollowed: user.isFollowed,
         }));
+        this.isLoading = false;
       } catch (error) {
         Toast.fire({
           icon: "error",
           title: "無法取得美食達人，請稍後再試",
         });
+        this.isLoading = false;
       }
     },
     async deleteFollowing(userId) {

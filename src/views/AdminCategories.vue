@@ -23,7 +23,8 @@
         </div>
       </div>
     </form>
-    <table class="table">
+    <Spinner v-if="isLoading" />
+    <table v-else class="table">
       <thead class="thead-dark">
         <tr>
           <th scope="col" width="60">
@@ -95,6 +96,7 @@
 
 <script>
 import AdminNav from "./../components/AdminNav";
+import Spinner from './../components/Spinner'
 
 import adminAPI from "./../apis/admin";
 import { Toast } from "./../utils/helpers";
@@ -103,11 +105,13 @@ export default {
   name: "AdminCategories",
   components: {
     AdminNav,
+    Spinner
   },
   data() {
     return {
       categories: [],
       newCategoryName: "",
+      isLoading: true
     };
   },
   created() {
@@ -116,6 +120,7 @@ export default {
   methods: {
     async fetchCategories() {
       try {
+        this.isLoading = true
         const { data } = await adminAPI.categories.get();
 
         if (data.status === "error") {
@@ -127,11 +132,13 @@ export default {
           isEditing: false,
           nameCached: "",
         }));
+        this.isLoading = false
       } catch (error) {
         Toast.fire({
           icon: "error",
           title: "無法取得餐廳類別，請稍後再試",
         });
+        this.isLoading = false
       }
     },
     async createCategory() {

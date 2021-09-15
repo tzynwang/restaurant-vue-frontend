@@ -1,5 +1,6 @@
 <template>
-  <form v-show="!isLoading" @submit.stop.prevent="handleSubmit">
+  <Spinner v-if="isLoading" />
+  <form v-else @submit.stop.prevent="handleSubmit">
     <div class="form-group">
       <label for="name">*Name</label>
       <input
@@ -108,11 +109,16 @@
 </template>
 
 <script>
+import Spinner from "./../components/Spinner";
+
 import adminAPI from "./../apis/admin";
 import { Toast } from "./../utils/helpers";
 
 export default {
   name: "AdminRestaurantForm",
+  components: {
+    Spinner,
+  },
   props: {
     initialRestaurant: {
       type: Object,
@@ -160,6 +166,7 @@ export default {
           icon: "error",
           title: "無法取得餐廳類別，請稍後再試",
         });
+        this.isLoading = false;
       }
     },
     handleFileChange(event) {

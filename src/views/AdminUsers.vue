@@ -2,7 +2,8 @@
   <div class="container py-5">
     <AdminNav />
 
-    <table class="table">
+    <Spinner v-if="isLoading" />
+    <table v-else class="table">
       <thead class="thead-dark">
         <tr>
           <th scope="col">
@@ -46,6 +47,7 @@
 
 <script>
 import AdminNav from "./../components/AdminNav";
+import Spinner from "./../components/Spinner";
 
 import { mapState } from "vuex";
 import adminAPI from "./../apis/admin";
@@ -55,10 +57,12 @@ export default {
   name: "AdminUsers",
   components: {
     AdminNav,
+    Spinner,
   },
   data() {
     return {
       users: [],
+      isLoading: true,
     };
   },
   created() {
@@ -67,6 +71,7 @@ export default {
   methods: {
     async fetchUsers() {
       try {
+        this.isLoading = true;
         const { data } = await adminAPI.users.get();
 
         if (data.status === "error") {
@@ -74,11 +79,13 @@ export default {
         }
 
         this.users = data.users;
+        this.isLoading = false;
       } catch (error) {
         Toast.fire({
           icon: "error",
           title: "無法取得論壇成員資料，請稍後再試",
         });
+        this.isLoading = false;
       }
     },
     async toggleUserRole({ userId, isAdmin }) {
@@ -89,11 +96,11 @@ export default {
           // 用的是字串判定，不是布林值，所以toggle isAdmin狀態後要.toString()
           isAdmin: (!isAdmin).toString(),
         });
-        
+
         if (data.status === "error") {
           throw new Error(data.message);
         }
-        
+
         this.users = this.users.map((user) => {
           if (user.id === userId) {
             return {
